@@ -1,0 +1,46 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Date JS Example</title>
+
+    <script type="text/javascript" src="scripts/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="scripts/date.js"></script>
+</head>
+<body>
+
+    <div id="input-container">
+        <input id="input-date" type="text" />
+    </div>
+    <div id="label-date-string">
+    </div>
+    <div id="label-date-unix">
+    </div>
+
+    <script type="text/javascript">
+
+        Date.prototype.toUnixTimestamp = function ()
+        {
+            console.log(this);
+            return Math.round(this.getTime() / 1000);
+        };
+
+        $(function ()
+        {
+            var input = $("#input-date");
+            var labelString = $("#label-date-string");
+            var labelUnix = $("#label-date-unix");
+
+            input.on("change", function ()
+            {
+                var date = Date.parse(input.val()) || new Date();
+
+                labelString.text(date.toString());
+                labelUnix.text(date.toUnixTimestamp());
+
+            });
+        });
+
+    </script>
+
+</body>
+</html>
