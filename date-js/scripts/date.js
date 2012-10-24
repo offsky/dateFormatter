@@ -112,10 +112,11 @@ Date.CultureInfo = {
         fri: /^fr(i(day)?)?/i,
         sat: /^sa(t(urday)?)?/i,
 
-        lastDayOf: /^last day of/i,
+        lastDayOf: /^(last day of)|(last of)/i,
+		firstDayOf: /^(first day of)|(first of)|(1st of)|first|1st/i,
         future: /^next/i,
         past: /^last|past|prev(ious)?/i,
-        add: /^(\+|after|from)/i,
+        add: /^(\+|after|from|in)/i,
         subtract: /^(\-|before|ago)/i,
         
         yesterday: /^yest(erday)?/i,
@@ -127,7 +128,7 @@ Date.CultureInfo = {
         second: /^sec(ond)?s?/i,
         minute: /^min(ute)?s?/i,
         hour: /^h(ou)?rs?/i,
-        week: /^w(ee)?k/i,
+        week: /^w((ee)?k)?(s)?/i,
         month: /^m(o(nth)?s?)?/i,
         day: /^d(ays?)?/i,
         year: /^y((ea)?rs?)?/i,
@@ -526,10 +527,11 @@ Date.prototype.set = function (config) {
     if (!x.month && x.month !== 0) { 
         x.month = -1; 
     }
-    if (!x.year && x.year !== 0) { 
+    if (!x.year && x.year !== 0)
+    {
         x.year = -1; 
     }
-
+	
     if (x.millisecond != -1 && Date.validateMillisecond(x.millisecond)) {
         this.addMilliseconds(x.millisecond - this.getMilliseconds()); 
     }
@@ -559,6 +561,19 @@ Date.prototype.set = function (config) {
     if (x.timezoneOffset) { 
         this.setTimezoneOffset(x.timezoneOffset); 
     }
+	    
+    var xDate = new Date(x.year != -1 ? x.year : this.getFullYear(),
+							x.month != -1 ? x.month : this.getMonth(),
+							x.day != -1 ? x.day : this.getDate(),
+							x.hour != -1 ? x.hour : this.getHours(),
+							x.minute != -1 ? x.minute : this.getMinutes(),
+							x.second != -1 ? x.second : this.getSeconds(),
+							x.millisecond != -1 ? x.millisecond : this.getMilliseconds());
+
+    xDate = new Date();
+
+    if (x.year == -1 && x.month <= xDate.getMonth() && x.day < xDate.getDate())
+    	this.addYears(1);
     
     return this;   
 };
@@ -1118,9 +1133,10 @@ Date.prototype.getOrdinal = function () {
         //
         // Tokenizers
         //
-        rtoken: function (r) { // regex token
+        rtoken: function (r) { // regex tokenfinishExact: function (x) {  
             return function (s) {
-                var mx = s.match(r);
+            	var mx = s.match(r);
+            	//console.log(s, r, mx);
                 if (mx) { 
                     return ([ mx[0], s.substring(mx[0].length) ]); 
                 } else { 
@@ -1707,6 +1723,26 @@ Date.prototype.getOrdinal = function () {
                 var gap, mod, orient;
                 orient = ((this.orient == "past" || this.operator == "subtract") ? -1 : 1);
 
+                if (this.orient == "lastDayOf")
+                {
+                	var lastDayOfDate = new Date(this.year || today.getFullYear(), this.month + 1, 0);
+                	if (lastDayOfDate.getDate())
+                		return lastDayOfDate;
+                }
+
+                if (this.orient == "firstDayOf")
+                {
+                	var firstDayOfDate = new Date(this.year || today.getFullYear(), this.month, 1);
+
+                	if (firstDayOfDate.getDate())
+                	{
+                		if (firstDayOfDate.getMonth() <= today.getMonth() && firstDayOfDate.getDate() < today.getDate())
+                			firstDayOfDate.addYears(1);
+
+                		return firstDayOfDate;
+                	}
+                }
+
                 if (this.weekday) {
                     this.unit = "day";
                     gap = (Date.getDayNumberFromName(this.weekday) - today.getDay());
@@ -1826,7 +1862,7 @@ Date.prototype.getOrdinal = function () {
     g.year = _fn(g.yyyy, g.yy);
 
     // relative date / time expressions
-    g.orientation = _.process(g.ctoken("past future lastDayOf"), 
+    g.orientation = _.process(g.ctoken("firstDayOf lastDayOf past future"),
         function (s) { 
             return function () { 
                 this.orient = s; 
@@ -1855,7 +1891,7 @@ Date.prototype.getOrdinal = function () {
             }; 
         }
     );
-    g.expression = _.set([ g.rday, g.operator, g.value, g.unit, g.orientation, g.ddd, g.MMM ]);
+    g.expression = _.set([ g.rday, g.operator, g.value, g.unit, g.orientation, g.ddd, g.MMM, g.yyyy ]);
 
     // pre-loaded rules for different date part order preferences
     _fn = function () { 
