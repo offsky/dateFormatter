@@ -49,7 +49,7 @@
             var t2 = today.clone().addWeeks(2).toUnixTimestamp();
             var t3 = today.clone().addMonths(3).toUnixTimestamp();
             var t4 = today.clone().addYears(4).toUnixTimestamp();
-            var t5 = today.clone().addDays(-1).toUnixTimestamp();
+            var t5 = today.clone().addDays(-5).toUnixTimestamp();
             var t6 = today.clone().addWeeks(-2).toUnixTimestamp();
             var t7 = today.clone().addMonths(-3).toUnixTimestamp();
             var t8 = today.clone().addYears(-4).toUnixTimestamp();
@@ -64,15 +64,15 @@
             equal(dp("in 3 months"), t3, "'in 3 months' parses to " + t3);
             equal(dp("in 4 years"), t4, "'in 4 years' parses to " + t4);
 
-            equal(dp("-1 day"), t5, "'-1 day' parses to " + t5);
+            equal(dp("-5 day"), t5, "'-5 day' parses to " + t5);
             equal(dp("-2 weeks"), t6, "'-2 weeks' parses to " + t6);
             equal(dp("-3 months"), t7, "'-3 months' parses to " + t7);
             equal(dp("-4 years"), t8, "'-4 years' parses to " + t8);
             
-            equal(dp("1 day ago"), t5, "'1 day ago' parses to " + t5);
+            equal(dp("5 days ago"), t5, "'5 days ago' parses to " + t5);
             equal(dp("2 weeks ago"), t6, "'2 weeks ago' parses to " + t6);
             equal(dp("3 months ago"), t7, "'3 months ago' parses to " + t7);
-            equal(dp("4 years agos", true), t8, "'4 years ago' parses to " + t8);
+            equal(dp("4 years ago"), t8, "'4 years ago' parses to " + t8);
         });
 
         test("next [day], next week/month/year", function() {
@@ -119,7 +119,7 @@
             equal(dp("Jan 1, '13"), t1, "'Jan 1, '13' parses to " + t1);
         });
 
-        test("Numeric - Locale ('en') - Month / Day / Year", function () {
+        test("Numeric - Locale ('en', 'en-US') - Month / Day / Year", function () {
             
             DateJSLoadCultureInfo('en');
 
@@ -129,11 +129,11 @@
             equal(dp("1.5.2013"), t1, "'1.5.2013' parses to " + t1);
             equal(dp("1-5-2013"), t1, "'1-5-2013' parses to " + t1);
         });
-        
-        test("Numeric - Locale ('en-GB') - Day / Month / Year", function () {
+
+        test("Numeric - Locale ('en-GB') - Day / Month / Year", function() {
 
             DateJSLoadCultureInfo('en-GB');
-            
+
             var t1 = new Date(2013, 4, 1).toUnixTimestamp();
 
             equal(dp("1/5/2013"), t1, "'1/5/2013' parses to " + t1);
