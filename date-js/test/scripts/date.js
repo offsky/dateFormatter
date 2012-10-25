@@ -1,6 +1,6 @@
 var DateJSLoadCultureInfo = function(language)
 {
-    if (language == "en-us" || language == "en")
+    if (language.toLowerCase() == "en-us" || language.toLowerCase() == "en")
     {
         Date.CultureInfo = {
             /* Culture Name */
@@ -173,7 +173,7 @@ if (Date.CultureInfo)
         sat: /^sa(t(urday)?)?/i,
 
         lastDayOf: /^(last day of)|(last of)/i,
-        firstDayOf: /^(first day of)|(first of)|(1st of)|first|1st/i,
+        firstDayOf: /^(first day of)|(first of)|(1st( day)? of)|first|1st/i,
         future: /^next/i,
         past: /^last|past|prev(ious)?/i,
         add: /^(\+|aft(er)?|from|hence|in)/i,
@@ -935,6 +935,15 @@ if (Date.CultureInfo)
     */
     $P.toUnixTimestamp = function () {
         return Math.round(this.getTime() / 1000);
+    };
+
+    $P.getMonthName = function (month)
+    {
+    	if (Date.CultureInfo && Date.CultureInfo.monthNames && month >= 0 && month < 12)
+    	{
+    		return Date.CultureInfo.monthNames[month];
+    	}
+    	return "";
     };
 
     /**

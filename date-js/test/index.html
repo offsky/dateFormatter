@@ -99,6 +99,8 @@
 
             equal(dp("last day of jan 2030"), t1, "'last day of jan 2030' parses to " + t1);
             equal(dp("first day of jan 2030"), t2, "'first day of jan 2030' parses to " + t2);
+            equal(dp("1st day of jan 2030"), t2, "'1st day of jan 2030' parses to " + t2);
+            equal(dp("1st of jan 2030"), t2, "'1st of jan 2030' parses to " + t2);
         });
 
         module("Date", {
@@ -139,6 +141,19 @@
             equal(dp("1/5/2013"), t1, "'1/5/2013' parses to " + t1);
             equal(dp("1.5.2013"), t1, "'1.5.2013' parses to " + t1);
             equal(dp("1-5-2013"), t1, "'1-5-2013' parses to " + t1);
+        });
+
+        test("Numeric/String in past without specified year", function ()
+        {
+            // Construct past date string dynamically to 6 months ago
+            var today = Date.today();
+            var pastDate = today.addMonths(-6);
+            var futrDate = pastDate.clone().addYears(1).toUnixTimestamp();
+
+            var monthName = Date.prototype.getMonthName(pastDate.getMonth());
+            var dateString = monthName + " " + pastDate.getDate();  // [month name] [day] (6 months ago)
+            
+            equal(dp(dateString), futrDate, "'" + dateString + "' parses to " + futrDate);
         });
 
     </script>
