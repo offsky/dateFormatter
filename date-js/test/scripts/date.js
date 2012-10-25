@@ -172,6 +172,7 @@ if (Date.CultureInfo)
         fri: /^fr(i(day)?)?/i,
         sat: /^sa(t(urday)?)?/i,
 
+		//numDayOf: /^[1-4].*of.*/i,
         lastDayOf: /^(last day of)|(last of)/i,
         firstDayOf: /^(first day of)|(first of)|(1st( day)? of)|first|1st/i,
         future: /^next/i,
@@ -1991,7 +1992,8 @@ if (Date.CultureInfo)
                 }
 
                 // if we're here, either there was no closing delimiter or we parsed it
-                // so now we have the best match; just return it!
+            	// so now we have the best match; just return it!
+                console.log(best);
                 return best;
             };
         },
@@ -2293,6 +2295,8 @@ if (Date.CultureInfo)
                 }
             }
 
+            console.log(this);
+
             if (!this.now && "hour minute second".indexOf(this.unit) != -1) {
                 today.setTimeToNow();
             }
@@ -2391,7 +2395,7 @@ if (Date.CultureInfo)
                 this.day = this.days;
             }
 
-            // console.log(this);
+            console.log(this);
 
             return (expression) ? today.add(this) : today.set(this);
         }
