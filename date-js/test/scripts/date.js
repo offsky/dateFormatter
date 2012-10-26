@@ -190,9 +190,9 @@ if (Date.CultureInfo)
         minute: /^mn|min(ute)?s?/i,
         hour: /^h(our)?s?/i,
         week: /^w(eek)?s?/i,
-        month: /^m(onth)?s?/i,
+        month: /^m((on)?th)?s?/i,
         day: /^d(ay)?s?/i,
-        year: /^y(ear)?s?/i,
+        year: /^yr(s)?|(y(ear)?s?)/i,
 
         shortMeridian: /^(a|p)/i,
         longMeridian: /^(a\.?m?\.?|p\.?m?\.?)/i,
@@ -1993,7 +1993,7 @@ if (Date.CultureInfo)
 
                 // if we're here, either there was no closing delimiter or we parsed it
             	// so now we have the best match; just return it!
-                console.log(best);
+                // console.log(best);
                 return best;
             };
         },
@@ -2295,7 +2295,7 @@ if (Date.CultureInfo)
                 }
             }
 
-            console.log(this);
+            // console.log(this.value, this.unit);
 
             if (!this.now && "hour minute second".indexOf(this.unit) != -1) {
                 today.setTimeToNow();
@@ -2350,7 +2350,7 @@ if (Date.CultureInfo)
                 this.unit = "month";
                 gap = (this.month - today.getMonth());
                 mod = 12;
-                this.months = gap ? ((gap + (orient * mod)) % mod) : (orient * mod);
+                this.months = this.value;// gap ? ((gap + (orient * mod)) % mod) : (orient * mod);
                 this.month = null;
             }
 
@@ -2386,16 +2386,47 @@ if (Date.CultureInfo)
             if ((this.month || this.month === 0) && !this.day) {
                 this.day = 1;
             }
-
+            
             if (!this.orient && !this.operator && this.unit == "week" && this.value && !this.day && !this.month) {
-                return Date.today().setWeek(this.value);
+                if (this.value)
+                {
+                    this.operator = "add";
+                    expression = true;
+                }
+                //  return Date.today().setWeek(this.value);
             }
+            
+            /*
+                Added Cases:
+            */
+            
+            if ( this.month != undefined && this.unit == "week")
+            {
+                this.value = (this.month + 1);
+                this[this.unit + "s"] = this.value;
+                this.operator = "add";
+                this.month = null;
+                this.day = null;
+                expression = true;
+            }
+
+            if (this.unit == "month" && this.day == 1 && this.value == 1)
+            {
+                this.operator = "add";
+                this.value = this[this.unit + "s"] = (this.month + 1);
+                this.day = this.month = null;
+                expression = true;
+            }
+
+            /*
+                End Additions
+            */
 
             if (expression && this.timezone && this.day && this.days) {
                 this.day = this.days;
             }
 
-            console.log(this);
+            //console.log(this);
 
             return (expression) ? today.add(this) : today.set(this);
         }
@@ -2776,7 +2807,12 @@ if (Date.CultureInfo)
     };
 }());
 
-var parseDateString = function (s, debug) {
-    var date = Date.parse(s) || new Date();
-    return debug ? date.toString() : date.toUnixTimestamp();
-}
+var parseDateString = function(s, debug)
+{
+    var date = Date.parse(s);
+    if (date != null)
+    {
+        return debug ? date.toString() : date.toUnixTimestamp();
+    }
+    return null;
+};
